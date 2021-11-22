@@ -61,7 +61,7 @@ namespace ImageShare.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FileId,FileTitle,FileCapturedBy,FileCapturedDate,FileGeolocation,FileUrl,FileTags")] FileDb fileDb)
         {
-            string path = "";
+            string path = @"C:\Users\izwelethu\source\repos\ImageShare\ImageShare\wwwroot\image\Clouds210742694.jpg";
             if (ModelState.IsValid)
             {
                 FileDb fileDbModel = new FileDb()
@@ -170,9 +170,15 @@ namespace ImageShare.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        public List<FileDb> SearchBook(string Title, string geolocation)
+        {
+            return null;
+        }
         private bool FileDbExists(int id)
         {
             return _context.FileDb.Any(e => e.FileId == id);
         }
+
     }
 }

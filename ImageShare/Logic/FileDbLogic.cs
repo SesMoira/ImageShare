@@ -29,5 +29,10 @@ namespace ImageShare.Logic
             }
             return false;
         }
+
+        //public List<FileDb> SearchBooks(string Title, string geolocation)
+        //{
+        //    return FileDb.SearchBook(Title, geolocation);
+        //}
     }
 }
