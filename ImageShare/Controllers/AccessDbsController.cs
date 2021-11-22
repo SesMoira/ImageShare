@@ -10,23 +10,23 @@ using ImageShare.Models;
 
 namespace ImageShare.Controllers
 {
-    public class MetadataDbsController : Controller
+    public class AccessDbsController : Controller
     {
         private readonly ImageShareDbContext _context;
 
-        public MetadataDbsController(ImageShareDbContext context)
+        public AccessDbsController(ImageShareDbContext context)
         {
             _context = context;
         }
 
-        // GET: MetadataDbs
+        // GET: AccessDbs
         public async Task<IActionResult> Index()
         {
-            var imageShareDbContext = _context.MetadataDb.Include(m => m.File);
+            var imageShareDbContext = _context.AccessDb.Include(a => a.File).Include(a => a.User);
             return View(await imageShareDbContext.ToListAsync());
         }
 
-        // GET: MetadataDbs/Details/5
+        // GET: AccessDbs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +34,45 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var metadataDb = await _context.MetadataDb
-                .Include(m => m.File)
-                .FirstOrDefaultAsync(m => m.MetadataId == id);
-            if (metadataDb == null)
+            var accessDb = await _context.AccessDb
+                .Include(a => a.File)
+                .Include(a => a.User)
+                .FirstOrDefaultAsync(m => m.AccessId == id);
+            if (accessDb == null)
             {
                 return NotFound();
             }
 
-            return View(metadataDb);
+            return View(accessDb);
         }
 
-        // GET: MetadataDbs/Create
+        // GET: AccessDbs/Create
         public IActionResult Create()
         {
             ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId");
+            ViewData["UserId"] = new SelectList(_context.AspNetUsers, "Id", "Id");
             return View();
         }
 
-        // POST: MetadataDbs/Create
+        // POST: AccessDbs/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
+        public async Task<IActionResult> Create([Bind("AccessId,UserId,FileId")] AccessDb accessDb)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(metadataDb);
+                _context.Add(accessDb);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
-            return View(metadataDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", accessDb.FileId);
+            ViewData["UserId"] = new SelectList(_context.AspNetUsers, "Id", "Id", accessDb.UserId);
+            return View(accessDb);
         }
 
-        // GET: MetadataDbs/Edit/5
+        // GET: AccessDbs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +80,24 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var metadataDb = await _context.MetadataDb.FindAsync(id);
-            if (metadataDb == null)
+            var accessDb = await _context.AccessDb.FindAsync(id);
+            if (accessDb == null)
             {
                 return NotFound();
             }
-            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
-            return View(metadataDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", accessDb.FileId);
+            ViewData["UserId"] = new SelectList(_context.AspNetUsers, "Id", "Id", accessDb.UserId);
+            return View(accessDb);
         }
 
-        // POST: MetadataDbs/Edit/5
+        // POST: AccessDbs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MetadataId,FileId,FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
+        public async Task<IActionResult> Edit(int id, [Bind("AccessId,UserId,FileId")] AccessDb accessDb)
         {
-            if (id != metadataDb.MetadataId)
+            if (id != accessDb.AccessId)
             {
                 return NotFound();
             }
@@ -102,12 +106,12 @@ namespace ImageShare.Controllers
             {
                 try
                 {
-                    _context.Update(metadataDb);
+                    _context.Update(accessDb);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MetadataDbExists(metadataDb.MetadataId))
+                    if (!AccessDbExists(accessDb.AccessId))
                     {
                         return NotFound();
                     }
@@ -118,11 +122,12 @@ namespace ImageShare.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
-            return View(metadataDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", accessDb.FileId);
+            ViewData["UserId"] = new SelectList(_context.AspNetUsers, "Id", "Id", accessDb.UserId);
+            return View(accessDb);
         }
 
-        // GET: MetadataDbs/Delete/5
+        // GET: AccessDbs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,31 +135,32 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var metadataDb = await _context.MetadataDb
-                .Include(m => m.File)
-                .FirstOrDefaultAsync(m => m.MetadataId == id);
-            if (metadataDb == null)
+            var accessDb = await _context.AccessDb
+                .Include(a => a.File)
+                .Include(a => a.User)
+                .FirstOrDefaultAsync(m => m.AccessId == id);
+            if (accessDb == null)
             {
                 return NotFound();
             }
 
-            return View(metadataDb);
+            return View(accessDb);
         }
 
-        // POST: MetadataDbs/Delete/5
+        // POST: AccessDbs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var metadataDb = await _context.MetadataDb.FindAsync(id);
-            _context.MetadataDb.Remove(metadataDb);
+            var accessDb = await _context.AccessDb.FindAsync(id);
+            _context.AccessDb.Remove(accessDb);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MetadataDbExists(int id)
+        private bool AccessDbExists(int id)
         {
-            return _context.MetadataDb.Any(e => e.MetadataId == id);
+            return _context.AccessDb.Any(e => e.AccessId == id);
         }
     }
 }
