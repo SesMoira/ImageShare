@@ -57,7 +57,7 @@ namespace ImageShare.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
+        public async Task<IActionResult> Create([Bind("FileId,FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
         {
             if (ModelState.IsValid)
             {
