@@ -1,0 +1,57 @@
+﻿@model ImageShare.Models.MetadataDb
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>MetadataDb</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="MetadataId" class="control-label"></label>
+                <input asp-for="MetadataId" class="form-control" />
+                <span asp-validation-for="MetadataId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileId" class="control-label"></label>
+                <select asp-for="FileId" class ="form-control" asp-items="ViewBag.FileId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileTitle" class="control-label"></label>
+                <input asp-for="FileTitle" class="form-control" />
+                <span asp-validation-for="FileTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CaptureBy" class="control-label"></label>
+                <input asp-for="CaptureBy" class="form-control" />
+                <span asp-validation-for="CaptureBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CapturedDate" class="control-label"></label>
+                <input asp-for="CapturedDate" class="form-control" />
+                <span asp-validation-for="CapturedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tags" class="control-label"></label>
+                <input asp-for="Tags" class="form-control" />
+                <span asp-validation-for="Tags" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

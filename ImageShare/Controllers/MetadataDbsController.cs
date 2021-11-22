@@ -7,30 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ImageShare.Data;
 using ImageShare.Models;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using ImageShare.Logic;
 
 namespace ImageShare.Controllers
 {
-    public class FileDbsController : Controller
+    public class MetadataDbsController : Controller
     {
         private readonly ImageShareDbContext _context;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public FileDbsController(ImageShareDbContext context, IWebHostEnvironment webHostEnvironment)
+        public MetadataDbsController(ImageShareDbContext context)
         {
             _context = context;
-            this._webHostEnvironment = webHostEnvironment;
         }
 
-        // GET: FileDbs
+        // GET: MetadataDbs
         public async Task<IActionResult> Index()
         {
-            return View(await _context.FileDb.ToListAsync());
+            var imageShareDbContext = _context.MetadataDb.Include(m => m.File);
+            return View(await imageShareDbContext.ToListAsync());
         }
 
-        // GET: FileDbs/Details/5
+        // GET: MetadataDbs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -38,53 +34,42 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var fileDb = await _context.FileDb
-                .FirstOrDefaultAsync(m => m.FileId == id);
-            if (fileDb == null)
+            var metadataDb = await _context.MetadataDb
+                .Include(m => m.File)
+                .FirstOrDefaultAsync(m => m.MetadataId == id);
+            if (metadataDb == null)
             {
                 return NotFound();
             }
 
-            return View(fileDb);
+            return View(metadataDb);
         }
 
-        // GET: FileDbs/Create
+        // GET: MetadataDbs/Create
         public IActionResult Create()
         {
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId");
             return View();
         }
 
-        // POST: FileDbs/Create
+        // POST: MetadataDbs/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FileId,FileTitle,FileCapturedBy,FileCapturedDate,FileGeolocation,FileUrl,FileTags")] FileDb fileDb)
+        public async Task<IActionResult> Create([Bind("MetadataId,FileId,FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
         {
-            string path = "";
             if (ModelState.IsValid)
             {
-                FileDb fileDbModel = new FileDb()
-                {
-                    FileId = fileDb.FileId,
-                    FileTitle = fileDb.FileTitle,
-                    FileCapturedBy = fileDb.FileCapturedBy,
-                    FileCapturedDate = fileDb.FileCapturedDate,
-                    FileGeolocation = fileDb.FileGeolocation,
-                    FileTags = fileDb.FileTags,
-                    FileUrl = fileDb.FileUrl
-                };
-
-                FileDbLogic fileDbLogic = new FileDbLogic();
-
-                var results = fileDbLogic.UploadImage(fileDbModel, path);
-
+                _context.Add(metadataDb);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(fileDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
+            return View(metadataDb);
         }
 
-        // GET: FileDbs/Edit/5
+        // GET: MetadataDbs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -92,22 +77,23 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var fileDb = await _context.FileDb.FindAsync(id);
-            if (fileDb == null)
+            var metadataDb = await _context.MetadataDb.FindAsync(id);
+            if (metadataDb == null)
             {
                 return NotFound();
             }
-            return View(fileDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
+            return View(metadataDb);
         }
 
-        // POST: FileDbs/Edit/5
+        // POST: MetadataDbs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FileId,FileTitle,FileCapturedBy,FileCapturedDate,FileGeolocation,FileUrl,FileTags")] FileDb fileDb)
+        public async Task<IActionResult> Edit(int id, [Bind("MetadataId,FileId,FileTitle,CaptureBy,CapturedDate,Tags")] MetadataDb metadataDb)
         {
-            if (id != fileDb.FileId)
+            if (id != metadataDb.MetadataId)
             {
                 return NotFound();
             }
@@ -116,12 +102,12 @@ namespace ImageShare.Controllers
             {
                 try
                 {
-                    _context.Update(fileDb);
+                    _context.Update(metadataDb);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FileDbExists(fileDb.FileId))
+                    if (!MetadataDbExists(metadataDb.MetadataId))
                     {
                         return NotFound();
                     }
@@ -132,10 +118,11 @@ namespace ImageShare.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(fileDb);
+            ViewData["FileId"] = new SelectList(_context.FileDbs, "FileId", "FileId", metadataDb.FileId);
+            return View(metadataDb);
         }
 
-        // GET: FileDbs/Delete/5
+        // GET: MetadataDbs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -143,36 +130,31 @@ namespace ImageShare.Controllers
                 return NotFound();
             }
 
-            var fileDb = await _context.FileDb
-                .FirstOrDefaultAsync(m => m.FileId == id);
-            if (fileDb == null)
+            var metadataDb = await _context.MetadataDb
+                .Include(m => m.File)
+                .FirstOrDefaultAsync(m => m.MetadataId == id);
+            if (metadataDb == null)
             {
                 return NotFound();
             }
 
-            return View(fileDb);
+            return View(metadataDb);
         }
 
-        // POST: FileDbs/Delete/5
+        // POST: MetadataDbs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-
-            var fileDb = await _context.FileDb.FindAsync(id);
-
-            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "image", fileDb.FileTitle);
-            if (System.IO.File.Exists(imagePath))
-                System.IO.File.Delete(imagePath);
-            //Delete record
-            _context.FileDb.Remove(fileDb);
+            var metadataDb = await _context.MetadataDb.FindAsync(id);
+            _context.MetadataDb.Remove(metadataDb);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool FileDbExists(int id)
+        private bool MetadataDbExists(int id)
         {
-            return _context.FileDb.Any(e => e.FileId == id);
+            return _context.MetadataDb.Any(e => e.MetadataId == id);
         }
     }
 }

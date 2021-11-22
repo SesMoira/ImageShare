@@ -180,7 +180,6 @@ namespace ImageShare.Data
 
                 entity.Property(e => e.FileUrl).HasMaxLength(50);
 
-                entity.Property(e => e.ImageFile).HasColumnType("image");
             });
 
             modelBuilder.Entity<MetadataDb>(entity =>

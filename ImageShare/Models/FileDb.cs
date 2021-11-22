@@ -27,9 +27,7 @@ namespace ImageShare.Models
         public string FileUrl { get; set; }
         [DisplayName("Tags")]
         public string FileTags { get; set; }
-        [NotMapped]
-        [DisplayName("Upload Image")]
-        public IFormFile ImageFile { get; set; }
+        
 
         public virtual ICollection<AccessDb> AccessDb { get; set; }
         public virtual ICollection<MetadataDb> MetadataDb { get; set; }
